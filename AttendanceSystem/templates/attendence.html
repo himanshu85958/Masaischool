@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Records{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h2><i class="bi bi-list-check"></i> Attendance Records</h2>
+    <a href="/admin/export/pdf" class="btn btn-danger">
+        <i class="bi bi-file-earmark-pdf"></i> Export PDF
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>UID</th>
+                <th>Name</th>
+                <th>Timestamp</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.UID }}</td>
+                <td>{{ record.Name }}</td>
+                <td>{{ record.Timestamp }}</td>
+                <td>
+                    {% if record.Status == 'Present' %}
+                    <span class="badge bg-success">Present</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">{{ record.Status }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="/admin" class="btn btn-outline-primary mt-3">
+    <i class="bi bi-arrow-left"></i> Back to Dashboard
+</a>
+{% endblock %}

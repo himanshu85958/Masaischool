@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="bi bi-graph-up"></i> Today's Attendance</h5>
+            </div>
+            <div class="card-body">
+                <div class="progress" style="height: 30px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ (present/total)*100 }}%"
+                         aria-valuenow="{{ (present/total)*100 }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ present }}/{{ total }} Present
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/admin/attendance" class="btn btn-outline-primary">
+                        <i class="bi bi-list-check"></i> View Attendance
+                    </a>
+                    <a href="/admin/export/pdf" class="btn btn-outline-danger">
+                        <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
