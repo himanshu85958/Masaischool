@@ -124,8 +124,4 @@ MIT License - Free for personal and educational use.
 
 Adafruit SSD1306
 
-(Replace yourusername with your GitHub handle.)
 
-Would you like me to add a FAQ section or troubleshooting guide? 😊
-
-New chat
