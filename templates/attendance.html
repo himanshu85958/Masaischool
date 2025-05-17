@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Attendance Records{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Attendance Records</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{{ url_for('export_attendance') }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Export to Excel
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('view_attendance') }}" class="row g-3">
+            <div class="col-md-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" name="date" value="{{ request.args.get('date', '') }}">
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">All</option>
+                    <option value="Present" {% if request.args.get('status') == 'Present' %}selected{% endif %}>Present</option>
+                    <option value="Absent" {% if request.args.get('status') == 'Absent' %}selected{% endif %}>Absent</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="uid" class="form-label">Student UID</label>
+                <input type="text" class="form-control" id="uid" name="uid" value="{{ request.args.get('uid', '') }}">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filter</button>
+                <a href="{{ url_for('view_attendance') }}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>UID</th>
+                        <th>Name</th>
+                        <th>Timestamp</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance %}
+                    <tr>
+                        <td>{{ record.UID }}</td>
+                        <td>{{ record.Name }}</td>
+                        <td>{{ record.Timestamp }}</td>
+                        <td>
+                            <span class="badge bg-{% if record.Status == 'Present' %}success{% else %}warning{% endif %}">
+                                {{ record.Status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">No attendance records found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

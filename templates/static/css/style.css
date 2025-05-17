@@ -1,0 +1,57 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.badge {
+    font-size: 0.9em;
+    padding: 5px 10px;
+}
+
+/* Custom colors for cards */
+.card.bg-primary {
+    background-color: #4e73df !important;
+}
+
+.card.bg-success {
+    background-color: #1cc88a !important;
+}
+
+/* Hover effect for table rows */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Modal animations */
+.modal.fade .modal-dialog {
+    transform: translate(0, -50px);
+    transition: all 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: translate(0, 0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+}

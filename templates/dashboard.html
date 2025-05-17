@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Dashboard</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+            <i class="bi bi-person-plus"></i> Register Student
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Today's Attendance Stats -->
+    <div class="col-md-4 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Today's Attendance</h5>
+                <h1 class="display-4">{{ present }}</h1>
+                <p class="card-text">Students present today</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Students -->
+    <div class="col-md-4 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Students</h5>
+                <h1 class="display-4">{{ total }}</h1>
+                <p class="card-text">Registered in system</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Quick Actions</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('manage_students') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-people-fill"></i> Manage Students
+                    </a>
+                    <a href="{{ url_for('view_attendance') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-calendar-check"></i> View Attendance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Live Attendance -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title d-flex justify-content-between">
+                    <span>Live Attendance</span>
+                    <small class="text-muted">Updates every 10 seconds</small>
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="liveAttendance">
+                        <thead>
+                            <tr>
+                                <th>UID</th>
+                                <th>Name</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Statistics -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Attendance Statistics</h5>
+                <canvas id="attendanceChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Register Student Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registerModalLabel">Register New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('register_with_rfid') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="uid" class="form-label">RFID UID</label>
+                        <input type="text" class="form-control" id="uid" name="uid" required>
+                        <small class="text-muted">Scan the RFID card to automatically fill this field</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Register Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-detect RFID from WebSocket or API
+function setupRFIDDetection() {
+    // This would be replaced with actual WebSocket or polling implementation
+    // For now, we'll simulate it with a button for demo purposes
+    document.getElementById('uid').addEventListener('click', function() {
+        // In a real system, this would come from the RFID reader
+        this.value = 'a1b2c3d4'; // Example UID
+    });
+}
+
+// Live Attendance Updates
+function updateLiveAttendance() {
+    fetch('/api/live_attendance')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector('#liveAttendance tbody');
+            tbody.innerHTML = '';
+            data.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.uid}</td>
+                    <td>${record.name}</td>
+                    <td>${record.timestamp}</td>
+                    <td><span class="badge bg-${record.status === 'Present' ? 'success' : 'warning'}">${record.status}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+// Attendance Chart
+function renderAttendanceChart() {
+    const ctx = document.getElementById('attendanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Present',
+                data: [65, 59, 80, 81, 56, 55, 40],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Absent',
+                data: [15, 21, 10, 9, 24, 25, 30],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setupRFIDDetection();
+    renderAttendanceChart();
+    updateLiveAttendance();
+    
+    // Update live attendance every 10 seconds
+    setInterval(updateLiveAttendance, 10000);
+});
+</script>
+{% endblock %}

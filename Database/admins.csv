@@ -1,0 +1,2 @@
+Username,PasswordHash
+admin,pbkdf2:sha256:600000$XAoHm6T85xSTB3dg$cc3b8d8e7909a0ef0cc0153e63d863d900b6a0fb9206dbd0c881172f622ecc26

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Manage Students{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Manage Students</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+            <i class="bi bi-person-plus"></i> Add Student
+        </button>
+        <a href="{{ url_for('export_students') }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Export to Excel
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>UID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Registered Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.UID }}</td>
+                        <td>{{ student.Name }}</td>
+                        <td>{{ student.Email }}</td>
+                        <td>{{ student.RegisteredDate }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary edit-btn" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editModal"
+                                    data-uid="{{ student.UID }}"
+                                    data-name="{{ student.Name }}"
+                                    data-email="{{ student.Email }}">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            <form action="{{ url_for('delete_student') }}" method="POST" class="d-inline">
+                                <input type="hidden" name="uid" value="{{ student.UID }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registerModalLabel">Register New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('register_with_rfid') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="uid" class="form-label">RFID UID</label>
+                        <input type="text" class="form-control" id="uid" name="uid" required>
+                        <small class="text-muted">Scan the RFID card to automatically fill this field</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Register Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Student Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('update_student') }}">
+                <input type="hidden" id="edit_uid" name="uid">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit_email" name="email" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Handle edit button clicks
+document.addEventListener('DOMContentLoaded', function() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            document.getElementById('edit_uid').value = this.dataset.uid;
+            document.getElementById('edit_name').value = this.dataset.name;
+            document.getElementById('edit_email').value = this.dataset.email;
+        });
+    });
+    
+    // Auto-detect RFID from WebSocket or API
+    document.getElementById('uid').addEventListener('click', function() {
+        // In a real system, this would come from the RFID reader
+        this.value = 'a1b2c3d4'; // Example UID
+    });
+});
+</script>
+{% endblock %}
